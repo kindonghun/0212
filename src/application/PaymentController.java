@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class PaymentController {
+	
+	
 	private ObservableList<Order> data;
 	private static Stage stage;
 	private Main mainApp;
@@ -40,12 +42,10 @@ public class PaymentController {
 	public void setMainApp(Main mainApp) {
 		this.mainApp = mainApp;
 	}
-
 	@FXML
-	public void back() { //뒤로가기
+	public void back() { //뒤로가기                                                                                                                                                                                                                                                                                                                                  
 		mainApp.ShowOrderView();
 	}
-
 	@FXML
 	private void initialize() {
 		table.setItems(data);
@@ -53,22 +53,24 @@ public class PaymentController {
 		sc.setCellValueFactory(cellData -> cellData.getValue().PriceProperty());
 
 	}
-
 	@FXML
 	public void PaymentPostulat() throws IOException { //주문완료 dialog
 		Stage dialog = new Stage(StageStyle.UTILITY);
 		dialog.initModality(Modality.WINDOW_MODAL);
 		dialog.initOwner(stage);
 		dialog.setTitle("주문완료");
-		Parent parent = FXMLLoader.load(getClass().getResource("paymentPostulat.fxml"));
+//		Parent parent = FXMLLoader.load(getClass().getResource("paymentPostulat.fxml"));
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("paymentPostulat.fxml"));
+		Parent parent= loader.load();
 		Scene scene = new Scene(parent);
 		dialog.setScene(scene);
 		// dialog.setResizable(false);
-		
+		paymentPostulatController con = loader.getController();
+		con.dialog= dialog;
 		dialog.show();
 		
 	}
-
 	@FXML
 	public void receipt() { //영수증출력
 		String menuInvoice = new String();
@@ -89,8 +91,23 @@ public class PaymentController {
 						+String.format("부가세:%7.0f원\r\n",+Integer.parseInt(SumPrice.getText())*0.1)
 						+String.format("총   액:%s\r\n",SumPrice.getText()+"원")
 						+String.format("합   계:%s",SumPrice.getText()+"원");
-	
+		
 		File file = new File("영수증.txt");
+		File file1 = new File("영수증1.txt");
+		
+		if(file1.exists())
+			try {
+				throw new java.io.IOException("file exists");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			boolean success = file.renameTo(file1);
+			if(!success) {
+				
+			}
+		
 		FileWriter writer = null;
 
 		try {
@@ -115,7 +132,6 @@ public class PaymentController {
 			}
 		}
 	}
-
 	private int CalcurateSumPrice() {
 		int sum = 0;
 		for (Order order : data) {
